@@ -18,6 +18,7 @@ var db =
 	'mongodb://localhost/';
 
 // Connecting to my MongoDB Database
+// i believe this needs additional coding
 mongoose.connect('mongodb://localhost:27017//MovieNews', {useMongoClient: true});
 
 router.get('/', function(req, res) {

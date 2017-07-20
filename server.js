@@ -9,7 +9,9 @@ var mongoose = require('mongoose');
 var express = require('express');
 var request = require('request');
 var bodyParser = require('body-parser');
+// requiring note and article models
 var Article = require()
+var Note = require()
 
 
 // First, tell the console what server.js is doing
@@ -57,13 +59,73 @@ app.get('/scrape', function(req, res){
       // An empty object to save the data that we'll scrape
       var results = {};
       // grabs title from each news article. code works below
-      const text = $(element).find(".title").text();
+      results.title = $(element).find(".title").text();
       // grabs the link title. code works below ;
-      const link = $(element).find('.link').attr("href");
-      // const title = $(text).children('a').text();
-      console.log(text);
-      console.log(link);
+      results.link = $(element).find('.link').attr("href");
+      
+      //using the article model, create a new entry
+      // this passes the result object to the entry
+      var entry = new Article(results);
+
+      // save the entry to the database
+      entry.save(function(err, doc) {
+        if(err) {
+          console.log(err)
+        } else {
+          console.log(doc)
+        }
+      });
+
+      });
+    });
+    // done with scraping the text 
+    res.send("Scrape Complete");
+  }); // done with scape function 
+      
+  // this will grab the articles that are scraped from mongodb
+  app.get('/articles', function(req, res) {
+    // grab every doc in the articles array
+    Article.find({})
+      .populate("Note")
+      .exec(function(error, doc) {
+        if(error) {
+          console.log(error)
+        } else {
+          // send the doc to the browser as a json object
+          res.json(doc)
+        }
+      })
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    app.listen(3000, function() {
+      console.log("The magic happens on port 3000");
+    })
+
+
+
       // Save the text of the element in a "title" variable
+  // Log the results once you've looped through each of the elements found with cheerio
+  // console.log(results);
       // var title = $(element).text();
 
       // In the currently selected element, look at its child elements (i.e., its a-tags),
@@ -74,9 +136,4 @@ app.get('/scrape', function(req, res){
     //   results.push({
     //     title: title,
     //     link: link
-       });
-   });
-
-  // Log the results once you've looped through each of the elements found with cheerio
-  // console.log(results);
-});
+ 

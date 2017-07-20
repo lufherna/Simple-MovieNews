@@ -61,5 +61,3 @@ app.use('/', router)
 app.listen(3000, function() {
 console.log("The magic happens on port 3000");
 })
-
- 

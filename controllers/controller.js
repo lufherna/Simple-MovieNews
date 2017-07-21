@@ -1,39 +1,23 @@
 // npm dependencies
+// have to remember that the controller only routes stuff
+// no connection to db needed here. as long as it's woring on
+// the server.js file 
 var request = require('request');
 var cheerio = require('cheerio');
 var mongoose = require('mongoose');
+var express = require('express');
 // this dependency creates mountable route handlers (portable)
 var router = express.Router();
-var express = require('express');
 
 // needs these models
 var Note = require('./../models/Note.js');
 var Article = require('./../models/Article.js');
-
-// connect to a mongo database via URI
-// use mongolab to connect the mongodb to heroku
-var db = 
-	process.env.MONGODB_URI ||
-	process.env.MONGOHQ_URL ||
-	'mongodb://localhost/';
-
-// Connecting to my MongoDB Database
-// i believe this needs additional coding
-mongoose.connect('mongodb://localhost:27017//MovieNews', {useMongoClient: true});
 
 router.get('/', function(req, res) {
 	// this is index.handlebars
 	res.render('index')
 })
 
-mongoose.connect(db, function(err, res) {
-
-	if(err) {
-		console.log("error connection to: " + db '. ' + err)
-	} else {
-		console.log("connected correctly to: " + db);
-	}
-});
 
 // screen rant movie url 
 var url = "http://screenrant.com/movie-news/";
@@ -73,12 +57,24 @@ router.get('/scrape', function(req, res){
     res.send("Scrape Complete");
 }); // done with scape function 
 
-router.post('/scrape', function(req, res) {
+// this will grab the articles scraped from the MongoDB
+router.get('/articles', function(req, res) {
+	// grab each doc in the articles array
+	// limits the number of articles that comes back
+	Article.find({}).limit(10)
+	  .populate('note')
+	  .exec(function(error, doc) {
+	  	// log errors
+	  	if (error) {
+	  		console.log(error)
+	  	} else {
+	  	// send the doc to the browser as a json object
+	  		res.json(doc)
+	  	}
+	  });// end of exec function
+	}); // end of router.get function
 
-
-})
-
-// this grabs the notes from /notes page
+/*// this grabs the notes from /notes page
 router.get('/notes', function(req, res) {
 	notes.find({})
 		.populate('note')
@@ -90,7 +86,7 @@ router.get('/notes', function(req, res) {
 				res.json(doc)
 			}
 		}) // ends exec function
-	}); // ends .get function
+	}); // ends .get function*/
 
 router.get('/notes/:id', function(req, res) {
 

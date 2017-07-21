@@ -10,8 +10,8 @@ var express = require('express');
 var request = require('request');
 var bodyParser = require('body-parser');
 // requiring note and article models
-// var Article = require("./models/Article.js");
-// var Note = require("./models/Note.js");
+var Article = require("./models/Article.js");
+var Note = require("./models/Note.js");
 
 // this is for heroku deployment
 var PORT = process.env.PORT || 3000
@@ -23,8 +23,16 @@ console.log("\n***********************************\n" +
             "\n***********************************\n");
 
 
+var dbConnect =
+    process.env.MONGODB_URI ||
+    process.env.MONGOHQ_URL ||
+    'mongodb://localhost/MovieNews';
+
+// mongoDB_URI : mongodb://heroku_f727w5fr:epf9p9fd2brsmmfop5246
+//vu6r3@ds115583.mlab.com:15583/heroku_f727w5fr
+
 // connect to the mongo db
-mongoose.connect('mongodb://localhost/', 
+mongoose.connect(dbConnect, 
   {useMongoClient: true }
 );
 
@@ -39,11 +47,12 @@ db.on('open', function() {
   console.log('Mongoose connection successful');
 });
 
+// initialize express
+var app = express();
+
 // Make public a static dir
 app.use(express.static('public'));
 
-// initialize express
-var app = express();
 
 // express-handlebars npm package
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));

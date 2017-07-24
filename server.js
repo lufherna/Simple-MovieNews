@@ -60,7 +60,7 @@ app.set('view engine', 'handlebars')
 // uses body parser with the app
 app.use(bodyParser.urlencoded({
   extended: false
-}))
+}));
 app.use(bodyParser.text());
 app.use(bodyParser.json({type: 'application/vnd.api+json'}));
 

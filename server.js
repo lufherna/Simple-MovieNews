@@ -67,6 +67,6 @@ app.use(bodyParser.json({type: 'application/vnd.api+json'}));
 var router = require('./controllers/controller.js');
 app.use('/', router)
 
-app.listen(3000, function() {
+app.listen(PORT, function() {
 console.log("The magic happens on port 3000");
 })

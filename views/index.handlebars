@@ -13,7 +13,10 @@
 			</div>
 				<div class = 'panel-body'>
 				<p> This is some Article title: {{this.title}}</p>
-				<p> This is the link: {{this.link}}</p>
+				<p> This is the link: <a href = {{this.link}}>{{this.link}}</a></p>
+			{{#each note}}
+				<p data-id = {{this.id}}>{{this.title}}</p>
+			{{/each}}
 				</div>
 			</div>
 		</div>

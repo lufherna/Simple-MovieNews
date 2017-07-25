@@ -14,9 +14,26 @@ var Note = require('./../models/Note.js');
 var Article = require('./../models/Article.js');
 
 router.get('/', function(req, res) {
-	// this is index.handlebars
-	res.render('index')
-})
+
+// this code finds the articles in our db but it limits the count
+	Article.find({}).limit( 10 )
+// this code populates 
+		.populate('note')
+
+		.exec(function(error, doc) {
+			// log any errors, if any
+			if (error) {
+				console.log(error)
+			} else {
+				var data = {data: doc};
+				// code below
+				// renders the data into index.handlebars
+				res.render('index', data);
+			}
+		}) // end of exec function
+/*	// this is index.handlebars
+	res.render('index')*/
+}); // end of router .get
 
 
 // screen rant movie url 
@@ -61,7 +78,7 @@ router.get('/scrape', function(req, res){
 router.get('/articles', function(req, res) {
 	// grab each doc in the articles array
 	// limits the number of articles that comes back
-	Article.find({}).limit(10)
+	Article.find({}).limit( 10 )
 	  .populate('note')
 	  .exec(function(error, doc) {
 	  	// log errors
@@ -69,7 +86,8 @@ router.get('/articles', function(req, res) {
 	  		console.log(error)
 	  	} else {
 	  	// send the doc to the browser as a json object
-	  		res.json(doc)
+	  		res.json(doc);
+	  		// res.render('index', { Articles: doc});
 	  	}
 	  });// end of exec function
 	}); // end of router.get function
@@ -88,11 +106,10 @@ router.get('/notes', function(req, res) {
 		}) // ends exec function
 	}); // ends .get function*/
 
-router.get('/notes/:id', function(req, res) {
+router.get('/articles/:id', function(req, res) {
 
-	Notes.findOne({'_id': req.params.id})
+	Article.findOne({'_id': req.params.id})
 		.populate('note')
-
 		.exec(function(error, doc) {
 			if(error) {
 				console.log(error)
@@ -102,9 +119,29 @@ router.get('/notes/:id', function(req, res) {
 		}) // exec function
 }) // router.post
 
-router.post('/notes/:id', function(req, res) {
+router.post('/articles/:id', function(req, res) {
 
+	// Create a new note and pass the req.body to the entry
+	var newNote = new Note(req.body);
 
-})
+	// save the note to the db
+	newNote.save(function(error, doc) {
+		if(error) {
+			console.log(error)
+		} else {
+			notes.findOneAndUpdate({ "_id": req.params.id },
+			  {$push: {'note': doc._id}})
+			.exec(function(err, doc) {
+				if (err) {
+					console.log(err)
+				} else {
+					res.render('index', {name: doc});
+				}
+			});
+			res.redirect('/')
+		}
+	});
+
+});
 
 module.exports = router;
